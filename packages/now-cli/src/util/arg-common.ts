@@ -25,7 +25,10 @@ const ARG_COMMON = {
 
   '--api': String,
 
-  '--target': String
+  '--target': String,
+
+  '--framework': String,
+  '--root-directory': String
 };
 
 export default () => ARG_COMMON;

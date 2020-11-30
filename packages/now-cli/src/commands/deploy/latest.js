@@ -12,6 +12,7 @@ import toHumanPath from '../../util/humanize-path';
 import Now from '../../util';
 import stamp from '../../util/output/stamp.ts';
 import createDeploy from '../../util/deploy/create-deploy';
+import { getFrameworks } from '../../util/get-frameworks';
 import getDeploymentByIdOrHost from '../../util/deploy/get-deployment-by-id-or-host';
 import parseMeta from '../../util/parse-meta';
 import code from '../../util/output/code';
@@ -329,7 +330,9 @@ export default async function main(
 
     if (typeof projectOrNewProjectName === 'string') {
       newProjectName = projectOrNewProjectName;
-      rootDirectory = await inputRootDirectory(path, output, autoConfirm);
+      rootDirectory =
+        argv['--root-directory'] ||
+        (await inputRootDirectory(path, output, autoConfirm));
     } else {
       project = projectOrNewProjectName;
       rootDirectory = project.rootDirectory;
@@ -536,25 +539,36 @@ export default async function main(
       createArgs.projectSettings = { sourceFilesOutsideRootDirectory };
     }
 
-    deployment = await createDeploy(
-      output,
-      now,
-      contextName,
-      [sourcePath],
-      createArgs,
-      org,
-      !project && !isFile,
-      path
-    );
+    deployment =
+      !argv['--framework'] &&
+      (await createDeploy(
+        output,
+        now,
+        contextName,
+        [sourcePath],
+        createArgs,
+        org,
+        !project && !isFile,
+        path
+      ));
 
     if (
-      deployment instanceof Error &&
-      deployment.code === 'missing_project_settings'
+      !deployment ||
+      (deployment instanceof Error &&
+        deployment.code === 'missing_project_settings')
     ) {
-      let { projectSettings, framework } = deployment;
+      let { projectSettings, framework } = deployment || {
+        projectSettings: {},
+      };
 
       if (rootDirectory) {
         projectSettings.rootDirectory = rootDirectory;
+      }
+
+      if (!framework && argv['--framework']) {
+        framework = (await getFrameworks(client)).find(
+          f => f.slug === argv['--framework']
+        );
       }
 
       if (typeof sourceFilesOutsideRootDirectory !== 'undefined') {
@@ -564,7 +578,8 @@ export default async function main(
       const settings = await editProjectSettings(
         output,
         projectSettings,
-        framework
+        framework,
+        autoConfirm
       );
 
       // deploy again, but send projectSettings this time
