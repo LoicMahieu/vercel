@@ -16,12 +16,13 @@ export interface JSONObject {
 }
 
 export interface AuthConfig {
-  token: string;
+  token?: string;
   skipWrite?: boolean;
 }
 
 export interface GlobalConfig {
   currentTeam?: string;
+  includeScheme?: string;
   collectMetrics?: boolean;
   api?: string;
 
@@ -139,13 +140,14 @@ export type Deployment = {
     | 'CANCELED';
   version?: number;
   created: number;
-  creator: { uid: string };
+  createdAt: number;
+  creator: { uid: string; username: string };
 };
 
 export type Alias = {
   uid: string;
   alias: string;
-  created: string;
+  createdAt: number;
   deployment: {
     id: string;
     url: string;
@@ -270,6 +272,7 @@ export interface Project extends ProjectSettings {
   rootDirectory?: string | null;
   latestDeployments?: Partial<Deployment>[];
   autoExposeSystemEnvs?: boolean;
+  sourceFilesOutsideRootDirectory: boolean;
 }
 
 export interface Org {

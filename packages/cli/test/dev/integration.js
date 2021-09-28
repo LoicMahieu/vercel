@@ -1710,7 +1710,9 @@ test(
       expectHeader('image/svg+xml'),
       fetchOpts('image/webp')
     );
-    // bmp should bypass: serve as-is
+    /* Disabled bmp because `next dev` bypasses
+     * and production will convert. Eventually
+     * we can enable once `next dev` supports it.
     await testPath(
       200,
       toUrl('/test.bmp', 64, 50),
@@ -1718,6 +1720,7 @@ test(
       expectHeader('image/bmp'),
       fetchOpts('image/webp')
     );
+    */
     // animated gif should bypass: serve as-is
     await testPath(
       200,
@@ -1725,6 +1728,25 @@ test(
       null,
       expectHeader('image/gif'),
       fetchOpts('image/webp')
+    );
+  })
+);
+
+test(
+  '[vercel dev] 40-mixed-modules',
+  testFixtureStdio('40-mixed-modules', async testPath => {
+    await testPath(200, '/entrypoint.js', 'mixed-modules:js');
+    await testPath(200, '/entrypoint.mjs', 'mixed-modules:mjs');
+    await testPath(200, '/entrypoint.ts', 'mixed-modules:ts');
+    await testPath(
+      200,
+      '/type-module-package-json/auto.js',
+      'mixed-modules:auto'
+    );
+    await testPath(
+      200,
+      '/type-module-package-json/nested/also.js',
+      'mixed-modules:also'
     );
   })
 );

@@ -161,9 +161,10 @@ export function convertTrailingSlash(enable: boolean, status = 308): Route[] {
   return routes;
 }
 
-export function sourceToRegex(
-  source: string
-): { src: string; segments: string[] } {
+export function sourceToRegex(source: string): {
+  src: string;
+  segments: string[];
+} {
   const keys: Key[] = [];
   const r = pathToRegexp(source, keys, {
     strict: true,
@@ -183,7 +184,7 @@ export function sourceToRegex(
 
 const namedGroupsRegex = /\(\?<([a-zA-Z][a-zA-Z0-9]*)>/g;
 
-function collectHasSegments(has?: HasField) {
+export function collectHasSegments(has?: HasField) {
   const hasSegments = new Set<string>();
 
   for (const hasItem of has || []) {
@@ -262,11 +263,11 @@ function replaceSegments(
       hash = hash ? safelyCompile(hash, indexes, true) : null;
 
       for (const [key, strOrArray] of Object.entries(query)) {
-        let value = Array.isArray(strOrArray) ? strOrArray[0] : strOrArray;
-        if (value) {
-          value = safelyCompile(value, indexes, true);
+        if (Array.isArray(strOrArray)) {
+          query[key] = strOrArray.map(str => safelyCompile(str, indexes, true));
+        } else {
+          query[key] = safelyCompile(strOrArray, indexes, true);
         }
-        query[key] = value;
       }
     }
 

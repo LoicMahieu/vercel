@@ -22,9 +22,11 @@ function getBuilderRoutesMapping(builds: Build[]) {
   return builderRoutes;
 }
 
-function getCheckAndContinue(
-  routes: Route[]
-): { checks: Route[]; continues: Route[]; others: Route[] } {
+function getCheckAndContinue(routes: Route[]): {
+  checks: Route[];
+  continues: Route[];
+  others: Route[];
+} {
   const checks: Route[] = [];
   const continues: Route[] = [];
   const others: Route[] = [];
@@ -37,7 +39,7 @@ function getCheckAndContinue(
           route
         )}`
       );
-    } else if (route.check) {
+    } else if (route.check && !route.override) {
       checks.push(route);
     } else if (route.continue && !route.override) {
       continues.push(route);
