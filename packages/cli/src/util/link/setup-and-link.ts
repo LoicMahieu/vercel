@@ -40,6 +40,7 @@ export interface SetupAndLinkOptions {
   successEmoji?: EmojiLabel;
   setupMsg?: string;
   projectName?: string;
+  defaultRootDirectory?: string;
 }
 
 export default async function setupAndLink(
@@ -52,6 +53,7 @@ export default async function setupAndLink(
     successEmoji = 'link',
     setupMsg = 'Set up',
     projectName = basename(path),
+    defaultRootDirectory,
   }: SetupAndLinkOptions
 ): Promise<ProjectLinkResult> {
   const { config } = client;
@@ -125,7 +127,9 @@ export default async function setupAndLink(
 
   if (typeof projectOrNewProjectName === 'string') {
     newProjectName = projectOrNewProjectName;
-    rootDirectory = await inputRootDirectory(client, path, autoConfirm);
+    rootDirectory =
+      defaultRootDirectory ||
+      (await inputRootDirectory(client, path, autoConfirm));
   } else {
     const project = projectOrNewProjectName;
 

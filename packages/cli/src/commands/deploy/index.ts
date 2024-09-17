@@ -231,6 +231,7 @@ export default async (client: Client): Promise<number> => {
       nowConfig: localConfig,
       paths,
     }),
+    defaultRootDirectory: parsedArguments.flags['--default-root-directory'],
   });
   if (typeof link === 'number') {
     return link;

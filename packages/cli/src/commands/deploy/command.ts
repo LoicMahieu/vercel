@@ -136,6 +136,13 @@ export const deployCommand = {
       deprecated: false,
       description: 'Specify the target deployment environment',
     },
+    {
+      name: 'default-root-directory',
+      shorthand: null,
+      type: String,
+      deprecated: false,
+      description: 'Specify the root directory when the project is created',
+    },
     confirmOption,
   ],
   examples: [
